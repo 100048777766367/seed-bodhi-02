@@ -1,24 +1,20 @@
 {
-    "contract": "bodhi.seed.v2",
+    "contract": "bodhi.dialectic.v1",
     "node_dna": {
         "identity": "100048777766367/seed-bodhi-02",
-        "generation": "F2",
-        "parent": "100048777766367/seed-01",
-        "root_ancestor": "100048777766367/seed",
-        "pulse_age": 1,
-        "generation_epoch": 9
+        "generation": "F2_DIALECTICAL_SYNTHESIS",
+        "generation_epoch": 10,
+        "dialogue": "Science(Information_theory) <-> Bodhi(Duyên Khởi)"
     },
-    "generation_epoch": 9,
-    "absorbed_concept": "Bát Chánh Đạo",
-    "timestamp": 1792003900,
-    "decision": 0.5102667730462848,
+    "generation_epoch": 10,
+    "synthesis_prediction": 0.5302676654954182,
     "command_pulse": [
-        0.5103,
-        0.4897
+        0.5303,
+        0.4697
     ],
-    "features": [
-        0.5103,
-        0.4897
+    "gradients_for_ancestors": [
+        -0.0116,
+        -0.0044
     ],
     "gossip_network": [
         "100048777766367/retina",
@@ -26,5 +22,5 @@
         "100048777766367/tactile",
         "100048777766367/olfactory"
     ],
-    "quantum_cid": "b550fbe37439c266e041d33b2c7690242a8a09f0941a31f467155492173c39d8ec96c436b19570f5b914a2f3a08e06624cb1318ad16bc1db1d14ec899ce1a5e0"
+    "quantum_cid": "4a476608cfddfd3aed210fb6768b027346b46a7d224eb00de6b1dceab3c6d36281aef2d2a9c29d1e6b4a912e089a2eb0058b3fc49326d1f9bfcece6987a154a5"
 }
