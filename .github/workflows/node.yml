@@ -1,0 +1,51 @@
+name: Seed-Bodhi Wisdom Invariant Lifecycle
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+  schedule:
+    - cron: '30 */4 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  run-bodhi-evolution:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kéo mã nguồn bằng Linux Shell gốc (Thoát ly Node.js)
+        run: |
+          git clone --depth 1 https://github.com/${{ github.repository }}.git .
+
+      - name: Thiết lập môi trường Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.10'
+
+      # VẬN HÀNH ĐỘNG CƠ TRI THỨC BỒ ĐỀ (GẶM CỎ WPESETD-AI & NÂNG THẾ HỆ 1+N)
+      - name: Vận hành Hạt Nhân Seed-Bodhi
+        env:
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_PARENT: ${{ github.event.repository.parent.owner.login }}
+        run: python engine.py
+
+      # LƯU TRẠNG THÁI BẰNG FAST-FORWARD CHỐNG CONFLICT (CÓ TOKEN BẢO MẬT CHỐNG LỖI 128)
+      - name: Lưu vết tích tiến hóa tri thức F2
+        run: |
+          git config --global user.name "Seed-Bodhi-Sage-Bot"
+          git config --global user.email "sage@bodhi.node"
+          
+          # CẤP TOKEN ĐỂ ĐƯỢC PHÉP PUSH (MIỄN NHIỄM LỖI 128)
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          
+          git fetch origin main
+          git reset origin/main
+          git add synapses/ synapse_backward.json synapse_forward.json 2>/dev/null || true
+          
+          if ! git diff --staged --quiet; then
+            git commit -m "🌿 [Seed-Bodhi F2] Khắc cốt tri thức triết học thế hệ #(1+N) [skip ci]"
+            git push origin main
+          else
+            echo "Môi trường tĩnh, không có biến đổi mới."
+          fi
