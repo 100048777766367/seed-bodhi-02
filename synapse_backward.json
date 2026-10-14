@@ -1,22 +1,22 @@
 {
     "contract": "bodhi.seed.v2",
     "node_dna": {
-        "identity": "100048777766367/seed-bodhi",
+        "identity": "100048777766367/seed-bodhi-02",
         "generation": "F2",
         "parent": "100048777766367/seed-01",
         "root_ancestor": "100048777766367/seed",
         "pulse_age": 1,
-        "generation_epoch": 8
+        "generation_epoch": 9
     },
-    "generation_epoch": 8,
-    "absorbed_concept": "Duyên Khởi",
-    "timestamp": 1791999111,
+    "generation_epoch": 9,
+    "absorbed_concept": "Bát Chánh Đạo",
+    "timestamp": 1792003900,
     "gradients_for_eye": [
-        -0.0105,
-        -0.0036
+        -0.0084,
+        -0.0023
     ],
     "super_xor_masks": {
-        "Duyên Khởi": [
+        "Bát Chánh Đạo": [
             11773.3782,
             9983.1254,
             47544.8811,
@@ -29,5 +29,5 @@
         "100048777766367/tactile",
         "100048777766367/olfactory"
     ],
-    "quantum_cid": "3fb4814525e833bd6a7bb19187c8c1a4667107f959fe2623c92574b54e331173e25eb05fa5adb27a2aec88a07969200b2aa5e3a44a6122a4a742a3d9f75f47db"
+    "quantum_cid": "80f842046f8163f8386d879912b438788889612ed9263339a4ab4eeae346db50a6d8bd08ab7f62d157e5a1935536b401016441fa210d13238b48cbfa101033c8"
 }
