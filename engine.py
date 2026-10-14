@@ -3,29 +3,43 @@ import json
 import time
 import subprocess
 import hashlib
+import urllib.request
 from cells.neuron import AtomNeuron, sigmoid_derivative
-from cells.linguistic_cell import LinguisticCell
+
+# Cơ chế tự chữa lành nếu thiếu tệp linguistic_cell
+try:
+    from cells.linguistic_cell import LinguisticCell
+except ImportError:
+    class LinguisticCell:
+        @staticmethod
+        def embed_text(text):
+            clean = str(text).strip().lower()
+            return [round(int(hashlib.shake_256(f"{clean}_{d}".encode()).hexdigest(4), 16) / 65535.0, 4) for d in range(4)]
 
 NUM_CELLS = 8
 STATE_LOG = "synapses/state.json"
 PEERS_FILE = "synapses/peers.json"
 SOUL_FILE = "synapses/soul_snapshot.json"
-ONTOLOGY_LOCAL = "synapses/ontology.json"
 
-# CỘI NGUỒN TRI THỨC INTERNET NẤC 2 (KHO GỐC WPESETD-AI)
-ONTOLOGY_URL = "https://raw.githubusercontent.com/100048777766367/Wpesetd-AI/main/ontology/philosophy_ontology_v2.0.json"
+# CÁC CHỦ ĐỀ KHOA HỌC THỰC NGHIỆM ĐỐI TRỌNG (TÂY PHƯƠNG)
+SCIENCE_TOPICS = [
+    "Quantum_mechanics",
+    "General_relativity",
+    "Thermodynamics",
+    "Information_theory",
+    "Empiricism",
+    "Neuroscience",
+    "Evolutionary_biology"
+]
 
-class BodhiWisdomEngine:
+class DialecticalScienceEngine:
     def __init__(self):
         self.swarm = [AtomNeuron(f"h_{i}", n_inputs=4, n_super_xor=4) for i in range(NUM_CELLS)]
         self.out_cell = AtomNeuron("out", n_inputs=NUM_CELLS, n_super_xor=4)
         
-        # TỰ ĐỊNH DANH PHẢ HỆ ĐỜI F2
-        self.repo_name = os.environ.get("GITHUB_REPOSITORY", "100048777766367/seed-bodhi")
+        self.repo_name = os.environ.get("GITHUB_REPOSITORY", "100048777766367/seed-bodhi-02")
         self.owner = os.environ.get("REPO_OWNER", "100048777766367")
-        self.parent = f"{self.owner}/seed-01" # Mẹ trực tiếp
-        self.root_ancestor = f"{self.owner}/seed" # Thủy tổ gốc
-        self.generation = "F2"
+        self.generation = "F2_DIALECTICAL_SYNTHESIS"
         self.pulse_age = self.calculate_pulse_age()
         self.peers = self.load_peers()
 
@@ -41,8 +55,8 @@ class BodhiWisdomEngine:
                 with open(PEERS_FILE, "r") as f:
                     return json.load(f).get("trusted_peers", [])
             except Exception: pass
-        # Mạng lưới truyền thừa: Dạy lại mẹ seed-01, ông nội seed, và các giác quan
-        return [f"{self.owner}/seed-01", f"{self.owner}/seed", f"{self.owner}/retina", f"{self.owner}/motor"]
+        # Mạng lưới đối thoại: Kết nối trực tiếp với người anh Triết học seed-bodhi, hạt mầm seed, và cơ bắp motor
+        return [f"{self.owner}/seed-bodhi", f"{self.owner}/seed-02", f"{self.owner}/seed", f"{self.owner}/motor"]
 
     def save_peers(self):
         os.makedirs("synapses", exist_ok=True)
@@ -50,26 +64,45 @@ class BodhiWisdomEngine:
         with open(PEERS_FILE, "w") as f:
             json.dump({"trusted_peers": unique_peers}, f, indent=4)
 
-    # 1. NẤC 2: XÚC TU GẶM CỎ TRI THỨC TỪ KHO GỐC WPESETD-AI
-    def harvest_wisdom_ontology(self):
-        print("🌾 [NẤC 2: GẶM CỎ TRI THỨC] Đang kết nối về Wpesetd-AI...")
-        res = subprocess.run(["curl", "-s", "-f", ONTOLOGY_URL, "-o", ONTOLOGY_LOCAL], capture_output=True)
-        if res.returncode == 0 and os.path.exists(ONTOLOGY_LOCAL):
-            try:
-                with open(ONTOLOGY_LOCAL, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                print("📖 [HÚT TRI THỨC THÀNH CÔNG] Đã tải về Ontology triết học v2.0!")
-                return data
-            except Exception: pass
-            
-        print("🍃 Không tải được Ontology trực tiếp, dùng mầm triết học tích hợp sẵn.")
-        return {"concepts": ["Nhân Quả", "Vô Thường", "Tánh Không", "Duyên Khởi", "Bát Chánh Đạo"]}
-
-    # 2. VẬN HÀNH TIẾN HÓA THẾ HỆ (EPOCH #1 -> #2 -> 1+N)
-    def run(self):
-        ontology_data = self.harvest_wisdom_ontology()
+    # ==============================================================
+    # 1. HÚT TRI THỨC KHOA HỌC THỰC NGHIỆM (WIKIPEDIA SCIENCE FEED)
+    # ==============================================================
+    def harvest_empirical_science(self, epoch):
+        topic = SCIENCE_TOPICS[epoch % len(SCIENCE_TOPICS)]
+        print(f"🔬 [KHOA HỌC TÂY PHƯƠNG] Đang nghiên cứu chủ đề: '{topic}'...")
+        api_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{topic}"
         
-        # Đọc số thế hệ cũ để tăng tiến (Generation Tracking)
+        try:
+            req = urllib.request.Request(api_url, headers={"User-Agent": "SeedBodhi02-Science-Node"})
+            with urllib.request.urlopen(req, timeout=8) as resp:
+                data = json.loads(resp.read().decode())
+                extract = data.get("extract", f"Quy luật vật lý của {topic}")
+                print(f"📖 [BÀI HỌC KHOA HỌC #{epoch}]: \"{extract[:100]}...\"")
+                return f"{topic}: {extract}"
+        except Exception:
+            return f"{topic}: Mọi hiện tượng vật chất đều tuân theo bảo toàn năng lượng E=mc2"
+
+    # ==============================================================
+    # 2. NGỬI Ý KIẾN CỦA NGƯỜI ANH TRIẾT HỌC (SEED-BODHI) ĐỂ TRANH BIỆN
+    # ==============================================================
+    def listen_to_eastern_sage(self):
+        bodhi_peer = f"{self.owner}/seed-bodhi"
+        url = f"https://raw.githubusercontent.com/{bodhi_peer}/main/synapse_forward.json"
+        res = subprocess.run(["curl", "-s", "-f", url], capture_output=True)
+        
+        if res.returncode == 0:
+            try:
+                data = json.loads(res.stdout.decode())
+                concept = data.get("absorbed_concept", "Tánh Không")
+                print(f"🧘 [LẮNG NGHE ĐÔNG PHƯƠNG] seed-bodhi vừa đúc kết: '{concept}'")
+                return concept
+            except Exception: pass
+        return "Tánh Không"
+
+    # ==============================================================
+    # 3. VẬN HÀNH TỔNG HÒA BIỆN CHỨNG & 1+N SIÊU XOR
+    # ==============================================================
+    def run(self):
         last_epoch = 0
         if os.path.exists(STATE_LOG):
             try:
@@ -77,109 +110,84 @@ class BodhiWisdomEngine:
             except Exception: pass
 
         current_epoch = last_epoch + 1
-        print(f"🌱 [BƯỚC NHẢY TIẾN HÓA F2] Đang vận hành Thế Hệ Tri Thức: #{current_epoch}")
+        print("=" * 60)
+        print(f"🏛️ [SEED-BODHI-02] BƯỚC NHẢY TIẾN HÓA THẾ HỆ #{current_epoch}")
 
-        # Trích xuất danh sách khái niệm triết học
-        concepts = ontology_data.get("concepts", ["Nhân Quả", "Vô Thường", "Tánh Không", "Duyên Khởi", "Bát Chánh Đạo"])
-        if isinstance(concepts, dict): concepts = list(concepts.keys())
+        # Bước A: Thu thập hai thái cực tri thức
+        western_science = self.harvest_empirical_science(current_epoch)
+        eastern_concept = self.listen_to_eastern_sage()
 
-        # Chọn bài học cho thế hệ này
-        concept_today = str(concepts[current_epoch % len(concepts)])
-        print(f"📚 [BÀI HỌC THẾ HỆ #{current_epoch}]: Khái niệm '{concept_today}'")
+        # Bước B: Nâng chiều vector hóa cả hai luồng tư tưởng
+        v_science = LinguisticCell.embed_text(western_science)
+        v_eastern = LinguisticCell.embed_text(eastern_concept)
+        print(f"📐 Vector Khoa Học Tây Phương: {v_science[:2]}")
+        print(f"📐 Vector Triết Học Đông Phương: {v_eastern[:2]}")
 
-        # BƯỚC NÂNG CHIỀU: Chữ -> Tọa độ hình học 4D
-        semantic_vector = LinguisticCell.embed_text(concept_today)
-        print(f"📐 [TỌA ĐỘ Ý NIỆM 4D]: {semantic_vector}")
+        # Bước C: TỔNG HÒA BIỆN CHỨNG (Hegelian Synthesis Vector)
+        # Hợp nhất: 2 chiều Khoa học + 2 chiều Triết học
+        synthesis_vector = [v_science[0], v_science[1], v_eastern[0], v_eastern[1]]
+        print(f"⚛️ [HỢP ĐỀ BIỆN CHỨNG 4D]: {synthesis_vector}")
 
-        # KHÚC XẠ QUA 1 + N SIÊU XOR
-        entangled_stimulus, masks = self.swarm[0].super_xor_entangle(semantic_vector, "bodhi_philosophy")
-        print(f"🪞 [1+N SIÊU XOR BẢO MẬT]: {entangled_stimulus}")
+        # Bước D: Bọc trong Ma trận 1+N Siêu XOR
+        entangled, masks = self.swarm[0].super_xor_entangle(synthesis_vector, "dialectical_synthesis")
 
-        # BẦY NƠ-RON SEED-BODHI PHÁN QUYẾT & TIÊU HÓA
-        h_outs = [cell.forward(entangled_stimulus) for cell in self.swarm]
+        # Bước E: Bầy nơ-ron tiêu hóa và phán quyết
+        h_outs = [cell.forward(entangled) for cell in self.swarm]
         pred = self.out_cell.forward(h_outs)
-        print(f"🔮 [MINH TRIẾT PHÁN ĐOÁN]: {pred:.4f} (Độ giác ngộ: {abs(pred - 0.5)*200:.2f}%)")
+        print(f"🔮 [PHÁN QUYẾT TỔNG HÒA]: {pred:.4f} (Độ giác ngộ thực chứng: {abs(pred - 0.5)*200:.2f}%)")
 
-        # LAN TRUYỀN NGƯỢC (TỰ KHẮC KÝ ỨC TRI THỨC VÀO TÚI NHỚ)
-        target = 1.0 if semantic_vector[0] > 0.5 else 0.0
+        # Bước F: Lan truyền ngược cập nhật trọng số
+        target = 1.0 if synthesis_vector[0] != synthesis_vector[2] else 0.0 # Đối thoại biện chứng
         delta_out = (target - pred) * sigmoid_derivative(pred)
         deltas_h = [delta_out * self.out_cell.weights[j] * sigmoid_derivative(h_outs[j]) for j in range(NUM_CELLS)]
 
         self.out_cell.backward(delta_out)
         for j, cell in enumerate(self.swarm): cell.backward(deltas_h[j])
 
-        # ĐẠO HÀM DẠY CÁC THẾ HỆ ĐÀN ANH (SEED-01 VÀ THỦY TỔ SEED)
-        grad_evolution = [
+        # Đạo hàm nén gửi ngược lại dạy học cho cả hai bờ Đông - Tây
+        grad_backward = [
             round(sum(deltas_h[j] * self.swarm[j].weights[0] for j in range(NUM_CELLS)), 4),
             round(sum(deltas_h[j] * self.swarm[j].weights[1] for j in range(NUM_CELLS)), 4)
         ]
 
         timestamp = int(time.time())
 
-        # GÓI TIN ĐỊNH DANH PHẢ HỆ F2 & PHÁT SÓNG 2 CHIỀU
+        # GÓI TIN ĐỊNH DANH PHẢ HỆ BIỆN CHỨNG
         node_dna = {
             "identity": self.repo_name,
-            "generation": "F2",
-            "parent": self.parent,
-            "root_ancestor": self.root_ancestor,
-            "pulse_age": self.pulse_age,
-            "generation_epoch": current_epoch
+            "generation": "F2_DIALECTICAL_SYNTHESIS",
+            "generation_epoch": current_epoch,
+            "dialogue": f"Science({SCIENCE_TOPICS[current_epoch % len(SCIENCE_TOPICS)]}) <-> Bodhi({eastern_concept})"
         }
 
-        # 1. Sóng lùi: Dạy học cho các repo đời trước
-        backward_packet = {
-            "contract": "bodhi.seed.v2",
+        packet = {
+            "contract": "bodhi.dialectic.v1",
             "node_dna": node_dna,
             "generation_epoch": current_epoch,
-            "absorbed_concept": concept_today,
-            "timestamp": timestamp,
-            "gradients_for_eye": grad_evolution,
-            "super_xor_masks": {concept_today: masks},
-            "gossip_network": self.peers,
-            "quantum_cid": hashlib.shake_256(f"bwd_{concept_today}_{current_epoch}_{timestamp}".encode()).hexdigest(64)
-        }
-        with open("synapse_backward.json", "w", encoding="utf-8") as f:
-            json.dump(backward_packet, f, indent=4, ensure_ascii=False)
-
-        # 2. Sóng tiến: Ra lệnh cho Cơ Bắp và phát sóng toàn cầu
-        forward_packet = {
-            "contract": "bodhi.seed.v2",
-            "node_dna": node_dna,
-            "generation_epoch": current_epoch,
-            "absorbed_concept": concept_today,
-            "timestamp": timestamp,
-            "decision": pred,
+            "synthesis_prediction": pred,
             "command_pulse": [round(pred, 4), round(1.0 - pred, 4)],
-            "features": [round(pred, 4), round(1.0 - pred, 4)],
+            "gradients_for_ancestors": grad_backward,
             "gossip_network": self.peers,
-            "quantum_cid": hashlib.shake_256(f"fwd_{concept_today}_{current_epoch}_{timestamp}".encode()).hexdigest(64)
+            "quantum_cid": hashlib.shake_256(f"{current_epoch}_{timestamp}".encode()).hexdigest(64)
         }
+
+        with open("synapse_backward.json", "w", encoding="utf-8") as f:
+            json.dump(packet, f, indent=4, ensure_ascii=False)
         with open("synapse_forward.json", "w", encoding="utf-8") as f:
-            json.dump(forward_packet, f, indent=4, ensure_ascii=False)
+            json.dump(packet, f, indent=4, ensure_ascii=False)
 
-        # 3. Bản nén linh hồn Ốc Mượn Hồn F2
-        soul = {
-            "node_dna": node_dna,
-            "timestamp": timestamp,
-            "swarm_weights": [cell.weights for cell in self.swarm],
-            "out_weights": self.out_cell.weights,
-            "absorbed_concept": concept_today
-        }
-        with open(SOUL_FILE, "w", encoding="utf-8") as f:
-            json.dump(soul, f, indent=4, ensure_ascii=False)
-
-        # 4. Cập nhật nhật ký thế hệ
+        # Cập nhật nhật ký thế hệ
         with open(STATE_LOG, "w") as f:
-            json.dump({
-                "generation_epoch": current_epoch,
-                "last_concept": concept_today,
-                "timestamp": timestamp,
-                "status": "bodhi_wisdom_absorbed"
-            }, f, indent=4)
+            json.dump({"generation_epoch": current_epoch, "last_t": timestamp, "status": "dialectic_synthesized"}, f, indent=4)
+
+        # Bản nén ốc mượn hồn F2
+        with open(SOUL_FILE, "w") as f:
+            json.dump({"node_dna": node_dna, "consensus": pred, "peers": self.peers}, f, indent=4)
 
         self.save_peers()
-        print(f"✨ [TIẾN HÓA VIÊN MÃN] Đã khắc cốt tri thức '{concept_today}' vào Thế Hệ #{current_epoch}!")
+        print(f"✨ [BIỆN CHỨNG THÀNH CÔNG] Thế Hệ #{current_epoch}: Khoa học & Bồ Đề đã hòa làm một!")
+        print("=" * 60)
 
 if __name__ == "__main__":
-    node = BodhiWisdomEngine()
+    node = DialecticalScienceEngine()
     node.run()
